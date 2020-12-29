@@ -2,10 +2,10 @@ import React, {useState} from "react";
 import {authService, firebaseInstance} from "fbase";
 
 const Auth = () => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [newAccount, setNewAccount] = useState(true);
-    const [error, setError] = useState("");
+    const [email, setEmail] = useState("");                 // email
+    const [password, setPassword] = useState("");           // password
+    const [newAccount, setNewAccount] = useState(true);     // new account register
+    const [error, setError] = useState("");                 // get error
 
     const onChange = (event) => {                   // email, password 등록
         const {target : {name, value}} = event;
@@ -30,6 +30,8 @@ const Auth = () => {
                     email, password
                 );
             }
+
+            console.log(data);      // 성공 메시지에 따른 추가 처리 하긔..!!
         }catch(error){
             setError(error.message);
         }
@@ -45,7 +47,7 @@ const Auth = () => {
             provider = new firebaseInstance.auth.GithubAuthProvider();
         }
 
-        const data = await authService.signInWithPopup(provider);
+        const data = await authService.signInWithPopup(provider);       // 이것도 따로 리턴을 해야하남..?
     }
 
     return(
