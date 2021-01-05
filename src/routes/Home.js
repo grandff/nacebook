@@ -1,33 +1,27 @@
 import React, {useState, useEffect} from "react";
 import { dbService } from "fbase";
+import Nacebook from "components/Nacebook";
 
-const Home = () => {    
+const Home = ({userObj}) => {    
     const [nacebook, setNacebook] = useState("");
     const [nacebooks, setNacebooks] = useState([]);    
-
-    // db select
-    const getNacebooks = async() => {
-        const dbNacebooks = await dbService.collection("nacebooks").get();
-        dbNacebooks.forEach((document) => {
-            const nacebookObject = {
-                ...document.data(),                                 // es6
-                id : document.id
-            }
-            setNacebooks((prev) => [nacebookObject, ...prev]);      // 함수 전달(es6)
-        });
-    }    
-
+        
     // built in
-    useEffect(() => {
-        getNacebooks();
+    useEffect(() => {        
+        // db select
+        dbService.collection("nacebooks").onSnapshot(snapshot => {
+            const nacebookArray = snapshot.docs.map((doc) => ({id : doc.id, ...doc.data()}));
+            setNacebooks(nacebookArray);
+        });
     }, [])
 
     // db insert
     const onSubmit = async (event) => {
         event.preventDefault();        
         await dbService.collection("nacebooks").add({
-            nacebook,
-            REG_DATE : Date.now()
+            text : nacebook,
+            REG_DATE : Date.now(),
+            REG_ID : userObj.uid
         });
         setNacebook("");        // insert 후 초기화
     };
@@ -42,13 +36,13 @@ const Home = () => {
         <div>
             <h1>Home</h1>
             <form onSubmit = {onSubmit}>
-                <input type = "text" placeholder="new text!" value={nacebook}  onChange={onChange} />
+                <input type="text" placeholder="new text!" value={nacebook}  onChange={onChange} />
                 <input type="submit" value="Submit"/>
             </form>
             <div>
-                {nacebooks.map((nacebook) => <div key={nacebook.id}>
-                    <h4>{nacebook.nacebook}</h4>
-                    </div>)}
+                {nacebooks.map((nacebook) => (
+                    <Nacebook key = {nacebook.id} nacebookObj = {nacebook} isOwner = {nacebook.REG_ID === userObj.uid} />
+                ))}
             </div>
         </div>        
     );
