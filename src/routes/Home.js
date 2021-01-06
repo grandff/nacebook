@@ -3,8 +3,9 @@ import { dbService } from "fbase";
 import Nacebook from "components/Nacebook";
 
 const Home = ({userObj}) => {    
-    const [nacebook, setNacebook] = useState("");
-    const [nacebooks, setNacebooks] = useState([]);    
+    const [nacebook, setNacebook] = useState("");       // 게시글 신규 등록
+    const [nacebooks, setNacebooks] = useState([]);     // 게시글 목록
+    const [attachment, setAttachment] = useState();     // 첨부파일 목록
         
     // built in
     useEffect(() => {        
@@ -18,6 +19,7 @@ const Home = ({userObj}) => {
     // db insert
     const onSubmit = async (event) => {
         event.preventDefault();        
+        let attachmentUrl = "";                         // 첨부파일 url
         await dbService.collection("nacebooks").add({
             text : nacebook,
             REG_DATE : Date.now(),
