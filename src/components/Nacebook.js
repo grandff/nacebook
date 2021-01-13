@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {dbService} from "fbase";
+import {dbService, storageService} from "fbase";
 
 const Nacebook = ({nacebookObj, isOwner}) => {
     const [editing, setEditing] = useState(false);                      // 수정 상태
@@ -9,7 +9,8 @@ const Nacebook = ({nacebookObj, isOwner}) => {
     const onDeleteClick = async () => {
         const ok = window.confirm("해당 글을 지우시겠습니까?");
         if(ok){
-            await dbService.doc(`nacebooks/${nacebookObj.id}`).delete();
+            await dbService.doc(`nacebooks/${nacebookObj.id}`).delete();            // delete object
+            await storageService.refFromURL(nacebookObj.attachmentUrl).delete();    // delete picture
         }
     }
 
@@ -51,6 +52,7 @@ const Nacebook = ({nacebookObj, isOwner}) => {
                 ) : (
                     <>
                         <h4>{nacebookObj.text}</h4>
+                        {nacebookObj.attachmentUrl && (<img src={nacebookObj.attachmentUrl} width="50px" height="50px"/>)}
                         {isOwner && (
                         <>
                             <button onClick={onDeleteClick}>Delete Nacebook</button>
