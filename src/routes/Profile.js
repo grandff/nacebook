@@ -18,11 +18,35 @@ const Profile = ({refreshUser, userObj}) => {
         await dbService.collection("nacebooks").where("creatorId","==",userObj.uid).orderBy("createdAt").get();
     };
 
+    // 새로운 프로필 정보 등록
+    const onSubmit = async (event) => {
+        event.preventDefault();
+        if(userObj.displayName !== newDisplayName){
+            await userObj.updateProfile({
+                displayName : newDisplayName
+            });
+            refreshUser();
+        }
+    }
+
     useEffect(() => {
         getMyNacebooks();
     }, []);
 
-    
+    const onChange = (event) => {
+        const {target : {value}} = event;
+        setNewDisplayName(value);
+    }
+
+    return(
+        <>
+            <form onSubmit={onSubmit}>
+                <input type="text" placeholder="Display name" onChange = {onChange} value={newDisplayName} />
+                <input type="submit" value="Update Profile" />                
+            </form>
+            <button onClick={onLogOutClick}>Log out</button>
+        </>
+    );
 }
 
 export default Profile;
